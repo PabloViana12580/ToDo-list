@@ -1,184 +1,128 @@
-//Definimos el estado para iniciar el totito
+/*
+-------------- Laboratorio tres web ToDo List -------------------
+-> Pablo Viana Vidal - 16091
+-> Fecha: 18/07/2018
+-> version 1.0
+*/
+
+//Definimos el estado para almacenar las tareas y agregar nuevas
 const state = {
-  posiciones: [0, 1, 2],
-  turno: 0,
-  tablero:[[0, 10, 20],
-           [10,11, 12],
-           [20,21, 23]],
+  tareas: [],
+  esperando: false,
+  filtro: 'Todos',
 };
+
+const crearBoton = (nombre) =>{
+  const boton = document.createElement("button");
+  boton.className = "boton";
+  boton.id = nombre;
+  return boton;
+}
 
 //Funcion de render
 const render = lState => {
 
-  //Creamos los elementos a utilizar
-  const title = document.createElement('h1');
-  title.innerHTML = 'TOTITO';
+  //Creamos el contenedor donde irán nuestros botones de filtros
+  const divBotones = document.createElement('div');
+  divBotones.className = 'divBotones';
 
-  const totito = document.createElement('div');
-  totito.className = 'totito';
+  const despliegue = document.createElement('div');
+  despliegue.className = 'despliegue';
 
-  const turnoCorriente = document.createElement('h2');
-  turnoCorriente.innerHTML = '¡Amigo! Actualmente es el turno de: '
+  const divAgregar = document.createElement('div');
+  divAgregar.className = 'agregar';
 
-  const indicadorTurno = document.createElement('div');
+  const divInput = document.createElement('input');
+  divInput.className = 'input';
 
-  indicadorTurno.className = 'indicador';
-  indicadorTurno.classList.add('equis');
+  const btnAgregar = document.createElement('button');
+  btnAgregar.className = 'btnAgregar';
 
-  const encapsulado = document.createElement('div');
-  const resetBtn = document.createElement('button');
-  encapsulado.className = 'encapsulado';
-  resetBtn.className = 'resetBtn';
-  resetBtn.innerHTML = '¡Reset!';
-  encapsulado.appendChild(resetBtn);
+  const t_agregar = document.createTextNode("Agregar tarea");
+  const t_todos = document.createTextNode("Todos");
+  const t_comple = document.createTextNode("Completados");
+  const t_activos = document.createTextNode("Activos"); 
+
+  btnAgregar.appendChild(t_agregar);
+
+  divAgregar.appendChild(divInput);
+  divAgregar.appendChild(btnAgregar);
 
   // Clear previous root content
   if (root.hasChildNodes()) {
     root.innerHTML = null;
   }
 
+  root.className = 'fondo';
   // Main rendering
-  root.appendChild(title);
-  root.appendChild(totito);
-  root.appendChild(turnoCorriente);
-  root.appendChild(indicadorTurno);
-  root.appendChild(encapsulado);
+  root.appendChild(divBotones);
+  root.appendChild(despliegue);
+  root.appendChild(divAgregar);
+  
 
-  resetBtn.style.visibility = 'hidden'; 
+  const categorias = ['todos','completados','activos']
 
-  //Dibujamos el tablero de totito creando cada columna
-  lState.posiciones.forEach( function(yPosi) {
-    const col = document.createElement('div');
-    col.className = 'col'; 
-    totito.appendChild(col);
+  categorias.forEach(
+    nombre => {
+      //creamos los botones y los ponemos en el div designado
+      const botones = crearBoton(nombre);
+      divBotones.appendChild(botones);
+    }
+  );
 
-    //Adentro de cada columna definimos las tres posiciones o casillas
-    lState.posiciones.forEach( function(xPosi){
-      const casilla = document.createElement('div');
-      casilla.className = 'casilla';
-      col.appendChild(casilla);
+  const botonTodos = document.getElementById('todos');
+  const botonCompletados = document.getElementById('completados');
+  const botonActivos = document.getElementById('activos');
 
-      //Definimos el evento onclick
-      casilla.onclick = () => {
+  botonTodos.appendChild(t_todos);
+  botonCompletados.appendChild(t_comple);
+  botonActivos.appendChild(t_activos);
 
-        //Si la casilla esta vacia, dependiendo del turno se rellena con circulo o con equis
-        if(casilla.classList.contains("circulo")==false && casilla.classList.contains("equis") ==false){
-          if((lState.turno % 2) == 0){
-            casilla.classList.add("equis");
-            indicadorTurno.classList.add('circulo');
-            lState.tablero[xPosi][yPosi] = 1;
-            lState.turno +=1;
-
-          }else{
-            casilla.classList.add("circulo");
-            indicadorTurno.classList.remove('circulo');
-            indicadorTurno.classList.add('equis');
-            lState.tablero[xPosi][yPosi] = 0;
-            lState.turno +=1;
-
-          }
-
-          //Chequeamos si cualquiera de las tres casillas horizontales son iguales para definir ganador
-          for (let i = 0; i < 3; i++) {
-            const pivote = lState.tablero[i][0];
-            if(pivote == lState.tablero[i][1] && pivote == lState.tablero[i][2]){
-              if(pivote == 1){
-                turnoCorriente.innerHTML = '¡Tenemos un ganador! Felicidades al jugador que utilizo "X"'
-                indicadorTurno.remove('equis');
-                indicadorTurno.remove('circulo');
-                totito.classList.add("done");
-                resetBtn.style.visibility = 'visible';
-              }else{
-                turnoCorriente.innerHTML = '¡Tenemos un ganador! Felicidades al jugador que utilizo "O"'
-                indicadorTurno.remove('equis');
-                indicadorTurno.remove('circulo');
-                totito.classList.add("done");
-                resetBtn.style.visibility = 'visible';
-              }
-
-            }
-          }
-
-          //Chequeamos si cualquiera de las tres casillas verticales son iguales para definir ganador
-          for (let i = 0; i < 3; i++) {
-            const pivote = lState.tablero[0][i];
-            if(pivote == lState.tablero[1][i] && pivote == lState.tablero[2][i]){
-              if(pivote == 1){
-                turnoCorriente.innerHTML = '¡Tenemos un ganador! Felicidades al jugador que utilizo "X"'
-                indicadorTurno.remove('equis');
-                indicadorTurno.remove('circulo');
-                totito.classList.add("done");
-                resetBtn.style.visibility = 'visible';
-              }else{
-                turnoCorriente.innerHTML = '¡Tenemos un ganador! Felicidades al jugador que utilizo "O"'
-                indicadorTurno.remove('equis');
-                indicadorTurno.remove('circulo');
-                totito.classList.add("done");
-                resetBtn.style.visibility = 'visible';
-              }
-
-            }
-          }
-
-          //Chequeamos la primer diagonal (izquieda -> derecha)
-          const check = lState.tablero[1][1]
-          if(check == lState.tablero[0][0] && check == lState.tablero[2][2]){
-              if(check == 1){
-                turnoCorriente.innerHTML = '¡Tenemos un ganador! Felicidades al jugador que utilizo "X"'
-                indicadorTurno.remove('equis');
-                indicadorTurno.remove('circulo');
-                totito.classList.add("done");
-                resetBtn.style.visibility = 'visible';
-              }else{
-                turnoCorriente.innerHTML = '¡Tenemos un ganador! Felicidades al jugador que utilizo "O"'
-                indicadorTurno.remove('equis');
-                indicadorTurno.remove('circulo');
-                totito.classList.add("done");
-                resetBtn.style.visibility = 'visible';
-              }
-
-          }
-
-          //Chequeamos la segunda diagonal (derecha -> izquierda)
-          if(check == lState.tablero[0][2] && check == lState.tablero[2][0]){
-              if(check == 1){
-                turnoCorriente.innerHTML = '¡Tenemos un ganador! Felicidades al jugador que utilizo "X"'
-                indicadorTurno.remove('equis');
-                indicadorTurno.remove('circulo');
-                totito.classList.add("done");
-                resetBtn.style.visibility = 'visible';
-              }else{
-                turnoCorriente.innerHTML = '¡Tenemos un ganador! Felicidades al jugador que utilizo "O"'
-                indicadorTurno.remove('equis');
-                indicadorTurno.remove('circulo');
-                totito.classList.add("done");
-                resetBtn.style.visibility = 'visible';
-              }
-
-          }
-
+  /*
+  botonTodos.onclick = () =>{
+    alert("Si sirve!!");
+  }
+  */
+fetch('https://raw.githubusercontent.com/samuelchvez/todos-fake-json-api/master/db.json')
+  .then((respuesta) => respuesta.json())
+  .then(function(data) {
+    data.forEach(
+      jsonData =>{
+        if (lState.tareas.includes(jsonData.title) === false) {
+          lState.tareas.push(jsonData.title);
         }
+        
+      }      
+    )
 
-        //En caso se acaban los turnos se declara empate
-        if(lState.turno == 9){
-          turnoCorriente.innerHTML = '¡El juego a terminado en empate!'
-          resetBtn.style.visibility = 'visible';
-          indicadorTurno.classList.remove('circulo');
-        }
-      }
-
-    });
-
-    
+    lState.tareas.forEach(
+    tarea =>{
+      const tareaBtn = document.createElement('button');
+      tareaBtn.className = 'tarea';
+      const t_boton = document.createTextNode(tarea);
+      tareaBtn.appendChild(t_boton);
+      despliegue.appendChild(tareaBtn);
+    }
+  )
+  })
+  .catch(function(error) {
+    console.log(error);
   });
 
-  //Definimos el boton para volver a empezar
-  resetBtn.onclick = () => {
-    window.location.reload(true);
+  btnAgregar.onclick = () => {
+    if(divInput.value != 0){
+      lState.tareas.push(divInput.value);
+
+    if (root.hasChildNodes()) {
+      root.innerHTML = null;
+    }
+
+    render(state);
+
+    }
   }
 
-
+  
 }
-
 //Llamamos funcion render
 render(state);
