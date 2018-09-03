@@ -120,7 +120,7 @@ fetch('https://raw.githubusercontent.com/samuelchvez/todos-fake-json-api/master/
     render(state);
 
     }
-  }
+  } 
 
   
 }
